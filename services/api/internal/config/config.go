@@ -29,12 +29,13 @@ func Load() (*Config, error) {
 	}
 
 	cfg := &Config{
-		DBHost:        getEnv("DB_HOST", "127.0.0.1"),
-		DBPort:        getEnv("DB_PORT", "3306"),
-		DBUser:        getEnv("DB_USER", "root"),
-		DBPassword:    getEnv("DB_PASSWORD", ""),
-		DBName:        getEnv("DB_NAME", "linkchat"),
-		APIPort:       getEnv("PORT", getEnv("API_PORT", "8080")), // Railway uses PORT
+		// Support both Railway MySQL variable names and custom DB_ names
+		DBHost:        getEnv("DB_HOST", getEnv("MYSQLHOST", "127.0.0.1")),
+		DBPort:        getEnv("DB_PORT", getEnv("MYSQLPORT", "3306")),
+		DBUser:        getEnv("DB_USER", getEnv("MYSQLUSER", "root")),
+		DBPassword:    getEnv("DB_PASSWORD", getEnv("MYSQLPASSWORD", "")),
+		DBName:        getEnv("DB_NAME", getEnv("MYSQLDATABASE", "linkchat")),
+		APIPort:       getEnv("PORT", getEnv("API_PORT", "8080")),
 		SessionSecret: getEnv("SESSION_SECRET", ""),
 	}
 
