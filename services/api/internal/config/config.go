@@ -18,9 +18,10 @@ type Config struct {
 	SessionSecret   string
 }
 
-// Load reads .env (if present) and returns a populated Config.
+// Load reads environment variables and returns a populated Config.
+// In production (Railway), env vars are set directly — no .env file needed.
 func Load() (*Config, error) {
-	// Try multiple .env locations depending on where the binary is run from.
+	// Best-effort: load .env if it exists (local dev only)
 	for _, path := range []string{".env", "../../.env", "../../../.env"} {
 		if err := godotenv.Load(path); err == nil {
 			break
@@ -33,7 +34,7 @@ func Load() (*Config, error) {
 		DBUser:        getEnv("DB_USER", "root"),
 		DBPassword:    getEnv("DB_PASSWORD", ""),
 		DBName:        getEnv("DB_NAME", "linkchat"),
-		APIPort:       getEnv("API_PORT", "8080"),
+		APIPort:       getEnv("PORT", getEnv("API_PORT", "8080")), // Railway uses PORT
 		SessionSecret: getEnv("SESSION_SECRET", ""),
 	}
 
