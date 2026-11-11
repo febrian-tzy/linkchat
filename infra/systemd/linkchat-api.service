@@ -1,0 +1,50 @@
+# ─── systemd Service: LinkChat Go Backend ────────────────────────────────────
+# Place this file at: /etc/systemd/system/linkchat-api.service
+# Commands:
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable linkchat-api
+#   sudo systemctl start linkchat-api
+#   sudo systemctl status linkchat-api
+#   sudo journalctl -u linkchat-api -f
+
+[Unit]
+Description=LinkChat API (Go Backend)
+Documentation=https://github.com/yourorg/linkchat
+After=network.target mysql.service
+Wants=mysql.service
+
+[Service]
+Type=simple
+User=linkchat
+Group=linkchat
+WorkingDirectory=/opt/linkchat/services/api
+
+# Binary built with: make api-build
+ExecStart=/opt/linkchat/services/api/bin/api
+
+# Graceful reload
+ExecReload=/bin/kill -HUP $MAINPID
+
+# Load environment variables from .env file
+EnvironmentFile=/opt/linkchat/.env
+
+# Restart policy
+Restart=on-failure
+RestartSec=5s
+StartLimitIntervalSec=60s
+StartLimitBurst=3
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/linkchat
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=linkchat-api
+
+[Install]
+WantedBy=multi-user.target
